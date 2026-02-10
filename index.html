@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>I Spent 3 Days Failing at This So You Can Do It in 30 Minutes</title>
 <meta name="description" content="A complete beginner's guide to creating Figma components with Claude Code. No coding experience needed.">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -104,6 +104,14 @@ code{background:var(--code-bg);padding:2px 6px;border-radius:3px;font-family:var
 </style>
 </head>
 <body>
+
+<nav style="max-width:680px;margin:0 auto;padding:24px 24px 0;text-align:center">
+  <a href="https://seeonk.com" target="_blank" class="see-logo">SEE</a>
+</nav>
+<style>
+.see-logo{font-family:'Inter',sans-serif;font-weight:900;font-size:1.1rem;letter-spacing:-.02em;color:var(--text);text-decoration:none;display:inline-block;transition:letter-spacing .4s cubic-bezier(.34,1.56,.64,1),transform .3s ease}
+.see-logo:hover{letter-spacing:.25em;transform:scale(1.1)}
+</style>
 
 <header class="hero">
   <p class="hero-sub" style="margin-bottom:24px">How to make Claude Code build Figma button components for you, live on your canvas. No coding experience needed. I literally have none.</p>
@@ -514,12 +522,12 @@ Create each variant one at a time.</div>
 
   <div class="callout" style="margin-bottom:16px">
     <p><strong>🤡 The SSL/TLS error that made me question my life choices</strong></p>
-    <p>Ran <code>bun socket</code>, got a terrifying wall of red text about SSL certificates. I thought I broke something deep inside my Mac. Nope. The server just had HTTPS enabled by default and I didn't have the certificates. The <code>sed</code> fix in Step 2 removes it in one line. I wish someone told me that on day one.</p>
+    <p>Ran <code>bun socket</code>, got a terrifying wall of red text about SSL certificates. I thought I broke something deep inside my Mac. Nope. The server just had HTTPS enabled by default and I didn't have the certificates. The <code>sed</code> fix in Step 2 removes it in one line.</p>
   </div>
 
   <div class="callout" style="margin-bottom:16px">
     <p><strong>🤡 Imported the wrong manifest.json (twice)</strong></p>
-    <p>There are TWO manifest files in the project. I imported the root one. Got a weird error. Deleted it. Imported the root one again because I forgot which one was wrong. Got the same error. Had a conversation with myself. Then found the right one in <code>src/cursor_mcp_plugin/</code></p>
+    <p>There are TWO manifest files in the project. I imported the root one. Got a weird error. Deleted it. Imported the root one again because I forgot which one was wrong. Got the same error. Had a conversation with myself. Then found the right one in <code>src/cursor_mcp_plugin/</code>.</p>
   </div>
 
   <div class="callout" style="margin-bottom:16px">
