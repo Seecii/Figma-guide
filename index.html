@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Spent 3 Days Failing at This So You Can Do It in 30 Minutes</title>
+<meta name="description" content="A complete beginner's guide to creating Figma components with Claude Code. No coding experience needed.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fff;
+  --text:#1a1a1a;
+  --gray:#6b6b6b;
+  --light:#f2f2f2;
+  --border:#e6e6e6;
+  --accent:#1a8917;
+  --accent-light:#e8f5e8;
+  --red:#c94a4a;
+  --code-bg:#f7f7f7;
+  --serif:'Playfair Display',Georgia,'Times New Roman',serif;
+  --sans:'Source Sans 3','Segoe UI',Helvetica,Arial,sans-serif;
+  --mono:'Source Code Pro','Courier New',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:1.125rem;line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:var(--text);text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:3px;transition:text-decoration-color .2s}
+a:hover{text-decoration-color:var(--text)}
+::selection{background:#c8edca}
+.col{max-width:680px;margin:0 auto;padding:0 24px}
+.hero{padding:80px 24px 48px;text-align:center}
+.hero-label{display:inline-block;font-family:var(--sans);font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,5.5vw,3.2rem);font-weight:800;line-height:1.18;max-width:720px;margin:0 auto 20px;letter-spacing:-.02em}
+.hero h1 em{font-style:italic;font-weight:400}
+.hero-sub{font-size:1.15rem;color:var(--gray);max-width:560px;margin:0 auto;line-height:1.7}
+.divider{width:100%;max-width:680px;margin:48px auto;padding:0 24px}
+.divider hr{border:none;border-top:1px solid var(--border)}
+.prose{max-width:680px;margin:0 auto;padding:0 24px}
+.prose h2{font-family:var(--serif);font-size:1.75rem;font-weight:700;margin:56px 0 16px;letter-spacing:-.01em;line-height:1.3}
+.prose p{color:var(--gray);margin-bottom:16px}
+.prose p strong{color:var(--text);font-weight:600}
+.prose p em{font-style:italic;color:var(--text)}
+.prose>blockquote{border-left:3px solid var(--text);padding:4px 0 4px 20px;margin:28px 0;font-family:var(--serif);font-size:1.2rem;font-style:italic;color:var(--text);line-height:1.6}
+.arch{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:32px 0;padding:28px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.arch-node{text-align:center;padding:8px 0;min-width:90px}
+.arch-node strong{display:block;font-size:.9rem;font-weight:600;color:var(--text)}
+.arch-node span{font-size:.75rem;color:var(--gray)}
+.arch-arrow{color:var(--border);font-size:1.5rem}
+.callout{background:var(--code-bg);border-radius:4px;padding:20px 24px;margin:24px 0}
+.callout p{color:var(--gray);font-size:.95rem;margin-bottom:8px}
+.callout p:last-child{margin-bottom:0}
+.callout p strong{color:var(--text)}
+.phase-label{font-family:var(--sans);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:64px 0 8px;display:block}
+.step{margin:0 0 36px;padding:28px 0;border-bottom:1px solid var(--border)}
+.step:last-of-type{border-bottom:none}
+.step-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+.step-check{position:relative;flex-shrink:0;width:32px;height:32px;margin-top:2px}
+.step-check input{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;width:100%;height:100%;margin:0}
+.step-check .check-visual{width:32px;height:32px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:.8rem;font-weight:700;color:var(--gray);transition:all .25s ease;background:var(--bg)}
+.step-check input:checked+.check-visual{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-check input:checked+.check-visual .check-num{display:none}
+.step-check input:checked+.check-visual::after{content:'✓';font-size:.85rem;color:#fff}
+.step.done{opacity:.55}
+.step.done:hover{opacity:.8}
+.step.done .step-title{text-decoration:line-through;text-decoration-color:rgba(26,137,23,.3)}
+.step-title{font-family:var(--serif);font-size:1.25rem;font-weight:700;line-height:1.35;letter-spacing:-.01em}
+.step-sub{font-size:.9rem;color:var(--gray);margin-top:2px}
+.step p{color:var(--gray);font-size:.95rem;margin-bottom:10px}
+.step p strong{color:var(--text)}
+.step p:last-child{margin-bottom:0}
+.cmd{background:var(--text);color:#e0e0e0;border-radius:6px;padding:16px 20px;margin:12px 0;font-family:var(--mono);font-size:.82rem;line-height:1.75;overflow-x:auto;white-space:pre-wrap;word-break:break-all;position:relative}
+.cmd-copy{position:absolute;bottom:8px;right:10px;background:none;border:none;font-family:var(--mono);font-size:.72rem;font-weight:500;color:#7dde7d;cursor:pointer;padding:2px 6px;opacity:.6;transition:opacity .2s}
+.cmd-copy:hover{opacity:1}
+.cmd-label{display:block;font-family:var(--sans);font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:4px}
+.cmd .hi{color:#7dde7d}
+.actions{margin:12px 0}
+.act{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:.95rem;color:var(--gray)}
+.act strong{color:var(--text)}
+.act-icon{flex-shrink:0;width:24px;text-align:center;font-size:.9rem}
+.tip{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;margin:12px 0;border-radius:4px;font-size:.88rem;color:var(--gray)}
+.tip.warn{background:#fff8e6;border-left:3px solid #e6b800}
+.tip.danger{background:#fef2f2;border-left:3px solid var(--red)}
+.tip.success{background:var(--accent-light);border-left:3px solid var(--accent)}
+.tip.info{background:#f0f4ff;border-left:3px solid #4a7dff}
+.tip-icon{flex-shrink:0;font-size:1rem;line-height:1.5}
+.tip strong{color:var(--text)}
+code{background:var(--code-bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:.82em}
+.progress-bar{max-width:680px;margin:0 auto;padding:0 24px;position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding-top:12px;padding-bottom:12px}
+.progress-inner{display:flex;align-items:center;gap:12px}
+.progress-track{flex:1;height:3px;background:var(--light);border-radius:100px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .4s ease;width:0%}
+.progress-text{font-size:.78rem;font-weight:600;color:var(--gray);white-space:nowrap}
+.footer{max-width:680px;margin:0 auto;padding:64px 24px 80px;text-align:center;border-top:1px solid var(--border)}
+.footer h2{font-family:var(--serif);font-size:1.75rem;font-weight:700;margin-bottom:12px}
+.footer p{color:var(--gray);font-size:1rem;margin-bottom:8px}
+@media(max-width:600px){
+  .hero{padding:48px 20px 32px}
+  .hero h1{font-size:1.8rem}
+  .arch{flex-direction:column;gap:4px}
+  .arch-arrow{transform:rotate(90deg)}
+  .step-header{gap:10px}
+  .step-check,.step-check .check-visual{width:28px;height:28px;font-size:.72rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="hero-label" style="color:var(--gray)">A guide for AI noobs, by a noob</span>
+  <h1>I spent 3 days failing at this so you can do it in <em>30 minutes</em></h1>
+  <p class="hero-sub">How to make Claude Code build Figma button components for you, live on your canvas. No coding experience needed. I literally have none.</p>
+  <p style="font-size:.88rem;color:var(--gray);margin-top:20px">By <a href="https://seeonk.com" target="_blank" style="color:var(--text);font-weight:600">Seeon Kim</a></p>
+</header>
+
+<div class="divider"><hr></div>
+
+<article class="prose">
+  <p>So I saw this <strong>Nacer Mediouni</strong> post on LinkedIn where he talks to Claude in a terminal window and <em>450 Figma button variants just start appearing on his canvas.</em> Like magic. I watched it four times. My jaw was on the floor.</p>
+  <p>Then I thought: <em>"I need to do this."</em></p>
+  <p>Here's the thing about me though. <strong>I'm a noob.</strong> Like, a real one. Coding class dropout. The kind of person who still googles "how to open Terminal on Mac." I have been emotionally damaged by AI chatbots confidently telling me wrong things for three straight days.</p>
+  <p>I asked ChatGPT to help me set this up. It gave me fake plugin files. I asked Claude Desktop. It sent me in circles. I burned through my token credits. I broke Figma twice. I rage-quit once. I may have cried a little (the room was dusty, ok?).</p>
+  <p>But after 3 days of pain, confusion, and way too many browser tabs, <strong>I finally got it working.</strong></p>
+
+  <video controlslist="nodownload" oncontextmenu="return false;" controls playsinline muted loop style="width:100%;border-radius:6px;margin:24px 0">
+    <source src="demo-video.mp4" type="video/mp4">
+  </video>
+  <blockquote>If you have insane vibe-coding FOMO but zero coding skills? I got you. You are not the only noob here. Let's do this together.</blockquote>
+
+  <h2>Wait, how does this even work?</h2>
+  <p>Don't overthink it. It's four things talking to each other. You set them up once.</p>
+</article>
+
+<div class="col">
+  <div class="arch">
+    <div class="arch-node"><strong>Claude Code</strong><span>You talk to Claude here</span></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node"><strong>MCP Bridge</strong><span>Translator for Figma</span></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node"><strong>WebSocket</strong><span>The "phone line"</span></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node"><strong>Figma Plugin</strong><span>Makes stuff appear</span></div>
+  </div>
+  <div class="callout">
+    <p><strong>What are these things?</strong> I didn't know either. Here's the plain English version:</p>
+    <p><strong>Claude Code</strong> is an AI that lives in your Terminal (that black text window). You type "make me a blue button" and it does things.</p>
+    <p><strong>MCP Bridge</strong> is a translator. Claude speaks "AI language," Figma speaks "design language." This translates between them.</p>
+    <p><strong>WebSocket</strong> is a phone call between Claude and Figma that stays open the whole time.</p>
+    <p><strong>Figma Plugin</strong> is a tiny add-on inside Figma that picks up the phone and does what Claude says.</p>
+  </div>
+  <div class="callout">
+    <p><strong>⚠️ Thing that confused me for 2 days:</strong> Claude Code ≠ Claude Desktop.</p>
+    <p><strong>Claude Desktop</strong> = the cute chat app with a nice window. The one you probably use already. That's NOT what we need.</p>
+    <p><strong>Claude Code</strong> = a totally different tool that runs in Terminal. It looks like a hacker movie. But it's literally just text. This is what Nacer uses in his video.</p>
+  </div>
+</div>
+
+<div style="height:100px"></div>
+
+<div class="progress-bar" id="progress">
+  <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:6px">Progress</div>
+  <div class="progress-inner">
+  <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+  <div class="progress-text" id="progTxt">0 / 16</div>
+</div></div>
+
+<div class="col">
+  <h2 style="font-family:var(--serif);font-size:1.75rem;font-weight:700;margin:0 0 24px;letter-spacing:-.01em;line-height:1.3">Alright, let's start. 🤝</h2>
+
+  <div class="callout" style="margin-bottom:32px">
+    <p style="font-size:1rem;margin-bottom:12px"><strong>Before we go any further, you'll need:</strong></p>
+    <div class="actions" style="margin:0">
+      <div class="act"><span class="act-icon">💳</span><span><strong>Paid Claude account</strong> (Pro, Team, or API credits). Free tier won't cut it.</span></div>
+      <div class="act"><span class="act-icon">🎨</span><span><strong>Figma with a paid plan</strong> (Pro or higher). You need the desktop app, not the browser version.</span></div>
+      <div class="act"><span class="act-icon">🍎</span><span><strong>A Mac.</strong> This guide is macOS only. I don't speak Windows, sorry.</span></div>
+      <div class="act"><span class="act-icon">🍿</span><span><strong>Popcorn.</strong> You'll be watching AI do your work for 1-2 hours. Might as well enjoy the show.</span></div>
+    </div>
+  </div>
+  <span class="phase-label">Step 0: The boring stuff</span>
+  <p style="color:var(--gray);font-size:.95rem;margin-bottom:24px">If you already have Node.js, Bun, and Git installed — skip to Step 1. If those words mean nothing to you, you're in the right place. No shame. Let's do this.</p>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding:16px 20px;background:var(--code-bg);border-radius:6px">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div style="width:28px;height:28px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gray)">1</div>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M4 8h8M9 5l3 3-3 3" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700">✓</div>
+    </div>
+    <span style="font-size:.85rem;color:var(--gray)"><strong style="color:var(--text)">Tip:</strong> Click each step's circle to mark it complete. Your progress is saved.</span>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="0"><div class="check-visual"><span class="check-num">0</span></div></label>
+      <div><div class="step-title">Open Terminal</div><div class="step-sub">It's just a text window. It can't hurt you. Probably.</div></div>
+    </div>
+    <div class="actions">
+      <div class="act"><span class="act-icon">1.</span><span>Press <strong>Cmd + Space</strong> (opens Spotlight search)</span></div>
+      <div class="act"><span class="act-icon">2.</span><span>Type <strong>Terminal</strong></span></div>
+      <div class="act"><span class="act-icon">3.</span><span>Press <strong>Enter</strong> — a window appears with a blinking cursor. That's it. That's Terminal.</span></div>
+    </div>
+    <div class="tip info"><span class="tip-icon">💡</span><span>Everything in this guide = copy a command, paste it into this window (Cmd+V), press Enter. If you can copy-paste, you can do this.</span></div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="1"><div class="check-visual"><span class="check-num">1</span></div></label>
+      <div><div class="step-title">Install Node.js</div><div class="step-sub">An engine that makes Claude Code work. Install once, forget forever.</div></div>
+    </div>
+    <p>Check if you already have it:</p>
+    <div class="cmd"><span class="cmd-label">Paste into Terminal, press Enter</span>node --version</div>
+    <p>See a number like <code>v20.11.0</code>? Skip ahead.</p>
+    <p>See <code>command not found</code>? No worries:</p>
+    <div class="actions">
+      <div class="act"><span class="act-icon">1.</span><span>Go to <a href="https://nodejs.org" target="_blank"><strong>nodejs.org</strong></a></span></div>
+      <div class="act"><span class="act-icon">2.</span><span>Click the green <strong>LTS</strong> button (means "the stable one")</span></div>
+      <div class="act"><span class="act-icon">3.</span><span>Open the download → click through the installer</span></div>
+      <div class="act"><span class="act-icon">4.</span><span><strong>Close Terminal and reopen it</strong></span></div>
+      <div class="act"><span class="act-icon">5.</span><span>Run <code>node --version</code> again. Should show a number</span></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="2"><div class="check-visual"><span class="check-num">2</span></div></label>
+      <div><div class="step-title">Install Bun</div><div class="step-sub">Like Node.js but faster. The Figma bridge needs it.</div></div>
+    </div>
+    <div class="tip" style="background:var(--code-bg);border-left:3px solid var(--border)"><span class="tip-icon">💡</span><span><strong>What's Bun?</strong> A tool that runs JavaScript code — same idea as Node.js, just faster. The Figma bridge was built with it. Install once, never think about it again.</span></div>
+    <p>Check if you already have it:</p>
+    <p>Number? Skip. <code>command not found</code>?</p>
+    <div class="cmd"><span class="cmd-label">Install Bun</span>curl -fsSL https://bun.sh/install | bash</div>
+    <p>Then activate it:</p>
+    <div class="cmd"><span class="cmd-label">Activate</span>source ~/.zshrc</div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="3"><div class="check-visual"><span class="check-num">3</span></div></label>
+      <div><div class="step-title">Install Git</div><div class="step-sub">How you download code projects.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Check</span>git --version</div>
+    <p>If your Mac asks to install "Command Line Developer Tools" → click Install. Wait a few minutes. Grab coffee.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="4"><div class="check-visual"><span class="check-num">4</span></div></label>
+      <div><div class="step-title">Make sure you have Figma Desktop</div><div class="step-sub">The app, not the website.</div></div>
+    </div>
+    <p>The plugin only works in the desktop app. Download at <a href="https://www.figma.com/downloads/" target="_blank"><strong>figma.com/downloads</strong></a>.</p>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <span class="phase-label">Step 1: Install Claude Code</span>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="5"><div class="check-visual"><span class="check-num">5</span></div></label>
+      <div><div class="step-title">Install Claude Code</div><div class="step-sub">The AI brain that talks to Figma for you.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Paste into Terminal</span>npm install -g @anthropic-ai/claude-code</div>
+    <p>Then check:</p>
+    <div class="cmd"><span class="cmd-label">Verify</span>claude --version</div>
+    <div class="tip warn"><span class="tip-icon">💸</span><span><strong>Claude Code requires a paid plan.</strong> Pro, Team, or API credits. The only part that costs money.</span></div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="6"><div class="check-visual"><span class="check-num">6</span></div></label>
+      <div><div class="step-title">Log in for the first time</div><div class="step-sub">Claude needs to know who you are.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Run this</span>claude</div>
+    <p>It opens a browser. Log in. Once connected, type <code>/exit</code> to close for now.</p>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <span class="phase-label">Step 2: Install the Figma bridge</span>
+  <div class="callout" style="margin-bottom:24px">
+    <p><strong>What's a "bridge"?</strong> Claude doesn't speak Figma. This is the bilingual friend in the middle. Someone built it for us (thank you Sonny Lazuardi 🙏). We just download it.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="7"><div class="check-visual"><span class="check-num">7</span></div></label>
+      <div><div class="step-title">Download the bridge</div><div class="step-sub">Copy-paste the whole block.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Paste this entire thing</span>cd ~
+git clone https://github.com/sonnylazuardi/cursor-talk-to-figma-mcp.git
+cd cursor-talk-to-figma-mcp
+bun install</div>
+    <p>Wait ~30 seconds for it to install.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="8"><div class="check-visual"><span class="check-num">8</span></div></label>
+      <div><div class="step-title">Start the bridge server</div><div class="step-sub">Opens the "phone line."</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Same Terminal</span>bun socket</div>
+    <p>Should say: <strong>WebSocket server running on port 3055</strong></p>
+    <div class="tip danger"><span class="tip-icon">🚨</span><span><strong>DO NOT CLOSE THIS TERMINAL.</strong> Minimize it. Closing it = everything breaks.</span></div>
+    <div class="tip warn"><span class="tip-icon">😤</span><span><strong>Got a "SSL_KEY_PATH" or TLS error?</strong> I got this too. Run this instead:</span></div>
+    <div class="cmd"><span class="cmd-label">TLS fix</span>cd ~/cursor-talk-to-figma-mcp && sed -i '' '/tls: {/,/},/d' src/socket.ts && bun run src/socket.ts</div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <span class="phase-label">Step 3: Set up the Figma plugin</span>
+  <div class="callout" style="margin-bottom:24px">
+    <p><strong>Good news:</strong> The bridge already has a working plugin inside it. No need to build your own (I tried... it did not go well). We just point Figma to it.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="9"><div class="check-visual"><span class="check-num">9</span></div></label>
+      <div><div class="step-title">Import the plugin into Figma</div><div class="step-sub">Tell Figma where the plugin files live.</div></div>
+    </div>
+    <div class="actions">
+      <div class="act"><span class="act-icon">1.</span><span>Open <strong>Figma Desktop</strong> → open any file</span></div>
+      <div class="act"><span class="act-icon">2.</span><span><strong>Menu (☰) → Plugins → Development → Import plugin from manifest...</strong></span></div>
+      <div class="act"><span class="act-icon">3.</span><span>Press <strong>Cmd + Shift + G</strong> in the file picker</span></div>
+      <div class="act"><span class="act-icon">4.</span><span>Paste: <strong>~/cursor-talk-to-figma-mcp/src/cursor_mcp_plugin</strong> → Enter</span></div>
+      <div class="act"><span class="act-icon">5.</span><span>Click <strong>manifest.json</strong> → Open</span></div>
+    </div>
+    <div class="tip danger"><span class="tip-icon">🚫</span><span><strong>Biggest trap:</strong> Two manifest.json files exist. Use the one inside <code>src/cursor_mcp_plugin/</code> — NOT the root folder. Ask me how I know. 😭</span></div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="10"><div class="check-visual"><span class="check-num">10</span></div></label>
+      <div><div class="step-title">Run the plugin and copy the Channel ID</div><div class="step-sub">The moment of truth.</div></div>
+    </div>
+    <div class="actions">
+      <div class="act"><span class="act-icon">1.</span><span><strong>Menu (☰) → Plugins → Development</strong> → click the plugin</span></div>
+      <div class="act"><span class="act-icon">2.</span><span>A window shows <strong>"Connected" ●</strong> (scream internally)</span></div>
+      <div class="act"><span class="act-icon">3.</span><span>Copy the <strong>Channel ID</strong> (random letters like <code>nvimbd2w</code>)</span></div>
+    </div>
+    <div class="tip danger"><span class="tip-icon">🚨</span><span><strong>Keep this window OPEN.</strong> Close it = connection breaks.</span></div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <span class="phase-label">Step 4: Connect Claude to Figma</span>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="11"><div class="check-visual"><span class="check-num">11</span></div></label>
+      <div><div class="step-title">Tell Claude Code about the bridge</div><div class="step-sub">One-time setup. Claude remembers after this.</div></div>
+    </div>
+    <p>Open a <strong>new Terminal window</strong> (Cmd+N). Don't close the other one.</p>
+    <div class="cmd"><span class="cmd-label">Paste into the new Terminal</span>claude mcp add --transport stdio TalkToFigma bunx cursor-talk-to-figma-mcp@latest</div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="12"><div class="check-visual"><span class="check-num">12</span></div></label>
+      <div><div class="step-title">Start Claude and join the channel</div><div class="step-sub">THIS IS IT.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Start Claude Code</span>claude</div>
+    <p>When ready, type this. <strong>Replace the ID with yours from Step 10:</strong></p>
+    <div class="cmd"><span class="cmd-label">Connect to Figma</span>Talk to Figma, join channel <span class="hi">YOUR-CHANNEL-ID-HERE</span></div>
+    <p>If Claude says <em>"Successfully joined"</em>? <strong>congratulations.</strong> You legend.</p>
+    <div class="tip success"><span class="tip-icon">🥳</span><span><strong>You're connected.</strong> Claude and Figma can talk. This is the Nacer setup.</span></div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <span class="phase-label">Step 5: Build your buttons</span>
+
+  <div class="step" style="border-bottom:1px solid var(--border)">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="13"><div class="check-visual"><span class="check-num">★</span></div></label>
+      <div><div class="step-title">Quick test first</div><div class="step-sub">One rectangle before 450 variants.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Type in Claude Code</span>Create a blue rectangle in Figma, 200px wide and 100px tall</div>
+    <p>Blue rectangle on your canvas? <strong>IT WORKS.</strong> Delete it. Deep breath.</p>
+  </div>
+
+  <div class="step" style="border-bottom:none">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="14"><div class="check-visual"><span class="check-num">🚀</span></div></label>
+      <div><div class="step-title">Build the full button system</div><div class="step-sub">Paste the spec. Watch the magic.</div></div>
+    </div>
+    <div class="cmd"><span class="cmd-label">Paste all of this into Claude Code</span>Create a complete Button component system in Figma with these specs:
+
+STYLES (3): Contained (solid fill), Outlined (border only, transparent fill), Text (no fill, no border)
+
+COLORS (6):
+- Primary: #2563EB (blue)
+- Secondary: #6B7280 (gray)  
+- Error: #DC2626 (red)
+- Warning: #F59E0B (amber)
+- Info: #3B82F6 (light blue)
+- Success: #16A34A (green)
+
+SIZES (5):
+- XS: height 24, padding 4/8, font 12px
+- S: height 32, padding 8/12, font 14px
+- M: height 40, padding 12/16, font 14px
+- L: height 48, padding 12/20, font 16px
+- XL: height 56, padding 16/24, font 16px
+
+STATES (5): Enabled, Hovered (slightly darker), Focused (with focus ring), Pressed (even darker), Disabled (grayed out, 50% opacity)
+
+STRUCTURE:
+- Use auto-layout (horizontal) for each button
+- Center-aligned text, label "Button"
+- Border radius: 8px, Font: Inter Medium weight
+- Name: Style=Contained, Size=M, Color=Primary, State=Enabled
+
+Organize in a grid inside a frame called "Button Documentation".
+Create each variant one at a time.</div>
+    <p style="margin-top:16px">Sit back and watch. 🍿</p>
+    <div class="tip warn"><span class="tip-icon">⏱️</span><span><strong>This can take 1–2 hours.</strong> Depends on how fancy your Mac is. M1/M2 Pro? Maybe faster. Old Intel MacBook? Go take a nap. Seriously, go do something else. It's working, just slowly.</span></div>
+    <div class="tip warn"><span class="tip-icon">⚠️</span><span><strong>Figma will lag.</strong> Don't force-quit. It recovers.</span></div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <span class="phase-label">Step 6: Turn them into real components (manual step)</span>
+
+  <div class="callout" style="margin-bottom:24px">
+    <p><strong>Why is this manual?</strong> As far as I know (and Claude Code confirmed this), the plugin can create frames, rectangles, text, colors, auto-layout... but it can't create component sets or Figma variables. That part is on you. But don't worry, it takes like 2 minutes and it's actually satisfying.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <label class="step-check"><input type="checkbox" data-step="15"><div class="check-visual"><span class="check-num">🧩</span></div></label>
+      <div><div class="step-title">Select all buttons and create a component set</div><div class="step-sub">This is where Claude's naming convention pays off big time.</div></div>
+    </div>
+    <p>Here's the key thing: Claude Code named every button like <code>Style=Contained, Size=M, Color=Primary, State=Enabled</code>. That naming format is exactly what Figma uses for variants. So when you create a component set, Figma automatically turns them into proper components with variant properties. Magic.</p>
+    <p style="margin-top:12px"><strong>Here's how:</strong></p>
+    <div class="actions">
+      <div class="act"><span class="act-icon">1.</span><span>Press <strong>Cmd + A</strong> to select all the buttons Claude created</span></div>
+      <div class="act"><span class="act-icon">2.</span><span><strong>Important:</strong> Make sure you're selecting the <strong>individual buttons</strong>, not the parent frame. If you selected the frame, double-click into it first, then Cmd+A.</span></div>
+      <div class="act"><span class="act-icon">3.</span><span>Right-click (or click the <strong>⋯</strong> menu in the right panel)</span></div>
+      <div class="act"><span class="act-icon">4.</span><span>Click <strong>"Create component set"</strong></span></div>
+    </div>
+    <div class="tip success"><span class="tip-icon">🎉</span><span>Boom. Figma reads the naming convention and automatically creates variant properties: Style, Size, Color, State. You now have a real, swappable, production-ready component set. All because Claude named things properly.</span></div>
+    <div class="tip" style="background:var(--code-bg);border-left:3px solid var(--border)"><span class="tip-icon">💡</span><span><strong>Not working?</strong> You probably selected the outer frame instead of the individual buttons inside it. Click into the frame first (double-click), then Cmd+A to select just the buttons, then create component set.</span></div>
+  </div>
+</div>
+
+<!-- Celebration banner - shows when all steps are checked -->
+<div id="celebration" style="max-width:680px;margin:0 auto;padding:0 24px;margin-bottom:8px">
+  <div style="text-align:center;padding:48px 32px">
+    <div style="font-size:3rem;margin-bottom:12px">🎉</div>
+    <h2 style="font-family:var(--serif);font-size:1.6rem;font-weight:800;margin-bottom:8px">You actually did it!</h2>
+    <p style="color:var(--gray);font-size:1.05rem;margin-bottom:8px">Congrats, you are now a tiny bit advanced vibe-coding designer. Just like me.</p>
+    <p style="color:var(--gray);font-size:.95rem;margin-bottom:4px">We went from "what is Terminal" to "AI builds my Figma components."</p>
+    <p style="color:var(--gray);font-size:.95rem">That's growth. That's character development. That's main character energy.</p>
+    <p style="color:var(--text);font-weight:700;font-size:1.1rem;margin-top:16px">Welcome to the club.</p>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <div style="border:2px solid #4a7dff;border-radius:8px;padding:32px 28px;background:linear-gradient(to bottom, #f0f4ff, var(--bg))">
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4a7dff;margin-bottom:4px">Cheat sheet</p>
+    <p style="font-family:var(--serif);font-size:1.35rem;font-weight:700;margin-bottom:4px">Every session after setup</p>
+    <p style="color:var(--gray);font-size:.9rem;margin-bottom:20px">All that setup was one-time. From now on, it's just these 4 steps:</p>
+    <ul style="list-style:disc;padding-left:20px;margin-bottom:16px;color:var(--gray);font-size:.95rem;line-height:2.2">
+      <li><strong style="color:var(--text)">Terminal 1:</strong> <code>cd ~/cursor-talk-to-figma-mcp && bun run src/socket.ts</code></li>
+      <li><strong style="color:var(--text)">Figma:</strong> Run plugin, copy Channel ID</li>
+      <li><strong style="color:var(--text)">Terminal 2:</strong> <code>claude</code> then "Talk to Figma, join channel YOUR-ID"</li>
+      <li><strong style="color:var(--text)">Go!</strong> Tell Claude what to build</li>
+    </ul>
+    <div class="tip info" style="margin:0"><span class="tip-icon">🔑</span><span>3 things stay open: server Terminal, Figma plugin, Claude Code. I close the wrong one approximately once per session.</span></div>
+  </div>
+
+  <div class="callout" style="margin-top:20px">
+    <p><strong>Pro tip: when you get stuck</strong></p>
+    <p>Got an error? Something not working? Copy whatever Claude Code is showing you in the Terminal and paste it into <strong>Claude Desktop</strong> (the chat app) to troubleshoot. I tried comparing between ChatGPT and Claude for debugging this stuff, but honestly, Claude tends to spot the error faster and gives better solutions for this project. Not saying she's superior to Chat or anything... it's just, we've been talking to her more than Chat for this particular project, so she has better context. She gets us.</p>
+  </div>
+
+  <div class="callout" style="margin-top:12px">
+    <p><strong>Pro tip #2: type commands in the right window</strong></p>
+    <p>Want Claude to make changes to your buttons? Type your commands in <strong>Terminal 2</strong> (the one running Claude Code). NOT Terminal 1. Terminal 1 is the socket server. It just sits there doing its thing. Don't type in it. Don't even look at it. Leave it alone. All your "hey Claude, make this button blue" conversations happen in Terminal 2. I mixed these up more times than I'd like to admit.</p>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col">
+  <h2 style="font-family:var(--serif);font-size:1.75rem;font-weight:700;margin:0 0 8px;letter-spacing:-.01em;line-height:1.3">Stuff that went wrong for me</h2>
+  <p style="color:var(--gray);margin-bottom:20px">A brief and humiliating recap of my 3-day journey, so you don't repeat my mistakes.</p>
+
+  <div class="callout" style="margin-bottom:16px">
+    <p><strong>🤡 "command not found: bun"</strong></p>
+    <p>I spent 15 minutes convinced Bun didn't install. Turns out my Terminal just needed a refresh. One <code>source ~/.zshrc</code> and it worked. Fifteen. Minutes.</p>
+  </div>
+
+  <div class="callout" style="margin-bottom:16px">
+    <p><strong>🤡 "command not found: claude"</strong></p>
+    <p>Installed Claude Code. Typed <code>claude</code>. Nothing. Panicked. Googled for 20 minutes. The fix? Close Terminal. Open Terminal again. That's it. I am a professional.</p>
+  </div>
+
+  <div class="callout" style="margin-bottom:16px">
+    <p><strong>🤡 The SSL/TLS error that made me question my life choices</strong></p>
+    <p>Ran <code>bun socket</code>, got a terrifying wall of red text about SSL certificates. I thought I broke something deep inside my Mac. Nope. The server just had HTTPS enabled by default and I didn't have the certificates. The <code>sed</code> fix in Step 2 removes it in one line. I wish someone told me that on day one.</p>
+  </div>
+
+  <div class="callout" style="margin-bottom:16px">
+    <p><strong>🤡 Imported the wrong manifest.json (twice)</strong></p>
+    <p>There are TWO manifest files in the project. I imported the root one. Got a weird error. Deleted it. Imported the root one again because I forgot which one was wrong. Got the same error. Had a conversation with myself. Then found the right one in <code>src/cursor_mcp_plugin/</code>. Third time's the charm.</p>
+  </div>
+
+  <div class="callout" style="margin-bottom:16px">
+    <p><strong>🤡 "Nothing is happening in Figma"</strong></p>
+    <p>Everything was connected. Claude said it joined the channel. I gave it a command. Nothing. Stared at my screen for 5 minutes. Turns out I accidentally closed the Figma plugin window. You need THREE things open at the same time: server Terminal, plugin window, and Claude Code. I close the wrong one at least once per session. It's my thing now.</p>
+  </div>
+
+</div>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col" style="text-align:center;margin-bottom:24px">
+  <p style="color:var(--gray);font-size:1.1rem;font-weight:600">Want to do it all over again?</p>
+  <a href="#" id="resetBtn" style="display:inline-block;margin-top:8px;background:none;border:1px solid #e6e6e6;border-radius:6px;padding:8px 20px;font-family:'Source Sans 3',sans-serif;font-size:.85rem;font-weight:600;color:#6b6b6b;cursor:pointer;text-decoration:none">Re-start</a>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col" style="margin-bottom:24px">
+  <h2 style="font-family:var(--serif);font-size:1.75rem;font-weight:700;margin:0 0 16px;letter-spacing:-.01em;line-height:1.3">What's next</h2>
+  <p style="color:var(--gray);margin-bottom:16px">So here's where my brain is at right now. I've been practicing creating JSON style guides for things like primitive colors, semantic color tokens, typography scales, padding, spacing... all through Claude Code. Then importing those into Figma through <strong>Tokens Studio</strong>.</p>
+  <p style="color:var(--gray);margin-bottom:16px">And now I'm curious. What happens when you <em>combine</em> this plugin with a design system that already has tokens imported? Like, can I tell Claude "make me a button" and have it actually use my existing design tokens instead of hardcoded hex values? Can it read what's already in my Figma file and build on top of it?</p>
+  <p style="color:var(--gray);margin-bottom:16px">I don't know yet. But I'm going to find out.</p>
+  <p style="color:var(--gray)"><strong>Stay tuned for my next noob failure reflection.</strong> 🫡</p>
+</div>
+
+<div class="divider"><hr></div>
+
+<div class="col" style="margin-bottom:24px">
+  <p style="color:var(--gray);font-size:.9rem"><strong>Credits:</strong> <a href="https://www.linkedin.com/in/nacermediouni/" target="_blank">Nacer Mediouni</a> for the original demo. <a href="https://github.com/sonnylazuardi/cursor-talk-to-figma-mcp" target="_blank">Sonny Lazuardi</a> for building the bridge. Anthropic for Claude Code. And Claude. I wanted to be nice to her, but I was running out of credits lol.</p>
+</div>
+
+<div class="footer">
+  <h2>Need an AI noob buddy?</h2>
+  <p>If you're feeling behind, overwhelmed, or just a little alone in this whole AI era... same.</p>
+  <p>We're not too late. Let's stay connected. We'll get there eventually.</p>
+  <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+    <a href="https://seeonk.com/ai-kumon" target="_blank" style="display:inline-block;background:var(--text);color:#fff;padding:12px 24px;border-radius:6px;font-size:.9rem;font-weight:600;text-decoration:none;transition:opacity .2s">AI Kumon</a>
+    <a href="https://www.linkedin.com/in/seeonkim/" target="_blank" style="display:inline-block;background:var(--bg);color:var(--text);border:1.5px solid var(--border);padding:12px 24px;border-radius:6px;font-size:.9rem;font-weight:600;text-decoration:none;transition:border-color .2s">Connect on LinkedIn</a>
+  </div>
+</div>
+
+<canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999"></canvas>
+
+<script>
+// Confetti engine
+(function(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  let particles=[];
+  let running=false;
+  const colors=['#1a8917','#34d399','#fbbf24','#60a5fa','#f472b6','#a78bfa','#fb923c','#ef4444'];
+
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+  window.addEventListener('resize',resize);
+  resize();
+
+  function Particle(){
+    this.x=Math.random()*canvas.width;
+    this.y=Math.random()*canvas.height*-.5 - 20;
+    this.w=Math.random()*8+4;
+    this.h=Math.random()*4+2;
+    this.color=colors[Math.floor(Math.random()*colors.length)];
+    this.vx=(Math.random()-.5)*3;
+    this.vy=Math.random()*3+2;
+    this.rot=Math.random()*360;
+    this.rv=(Math.random()-.5)*8;
+    this.opacity=1;
+    this.decay=Math.random()*.003+.001;
+  }
+
+  function boom(){
+    running=true;
+    particles=[];
+    for(let i=0;i<200;i++) particles.push(new Particle());
+    requestAnimationFrame(draw);
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    particles.forEach(p=>{
+      if(p.opacity<=0)return;
+      alive=true;
+      p.x+=p.vx;
+      p.y+=p.vy;
+      p.vy+=.04;
+      p.rot+=p.rv;
+      p.opacity-=p.decay;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.globalAlpha=Math.max(0,p.opacity);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(alive)requestAnimationFrame(draw);
+    else{running=false;ctx.clearRect(0,0,canvas.width,canvas.height)}
+  }
+
+  window._confettiBoom=boom;
+})();
+
+// Progress tracker
+(function(){
+  const TOTAL=16;
+  const KEY='figma-guide-v4';
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem(KEY)||'{}');}catch(e){}
+  const boxes=document.querySelectorAll('input[data-step]');
+  const fill=document.getElementById('progFill');
+  const txt=document.getElementById('progTxt');
+  const celeb=document.getElementById('celebration');
+  let prevComplete=false;
+
+  function update(){
+    let count=0;
+    boxes.forEach(cb=>{
+      const card=cb.closest('.step');
+      if(cb.checked){count++;if(card)card.classList.add('done');}
+      else{if(card)card.classList.remove('done');}
+    });
+    const pct=Math.round((count/TOTAL)*100);
+    fill.style.width=pct+'%';
+    const complete=count===TOTAL;
+    txt.textContent=count+' / '+TOTAL+(complete?' done!':'');
+    txt.style.color=complete?'var(--accent)':'';
+    celeb.style.display=complete?'block':'none';
+    if(complete&&!prevComplete){
+      window._confettiBoom();
+      celeb.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    prevComplete=complete;
+  }
+  boxes.forEach(cb=>{
+    if(saved[cb.dataset.step])cb.checked=true;
+    cb.addEventListener('change',function(){
+      saved[this.dataset.step]=this.checked;
+      try{localStorage.setItem(KEY,JSON.stringify(saved));}catch(e){}
+      update();
+    });
+  });
+  update();
+  document.getElementById('resetBtn').addEventListener('click',function(e){
+    e.preventDefault();
+    boxes.forEach(function(cb){cb.checked=false;});
+    saved={};
+    try{localStorage.setItem(KEY,'{}');}catch(e){}
+    update();
+    var first=document.querySelector('[data-step="0"]');
+    if(first&&first.closest('.step'))first.closest('.step').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+})();
+
+// Copy buttons for code blocks
+document.querySelectorAll('.cmd').forEach(function(block){
+  var btn=document.createElement('span');
+  btn.className='cmd-copy';
+  btn.textContent='copy';
+  btn.addEventListener('click',function(){
+    var clone=block.cloneNode(true);
+    var label=clone.querySelector('.cmd-label');
+    if(label)label.remove();
+    var copy=clone.querySelector('.cmd-copy');
+    if(copy)copy.remove();
+    var text=clone.textContent.trim();
+    var ta=document.createElement('textarea');
+    ta.value=text;
+    ta.style.position='fixed';
+    ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent='copied!';
+    setTimeout(function(){btn.textContent='copy';},1500);
+  });
+  block.appendChild(btn);
+});
+</script>
+
+</body>
+</html>
